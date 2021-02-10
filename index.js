@@ -1,10 +1,11 @@
 const express = require('express')
 const app = express()
+const morgan = require('morgan')
 
 // middleware
 app.use(express.json())
 app.use(express.urlencoded())
-
+app.use(morgan('tiny'))
 
 let persons = [
     {
