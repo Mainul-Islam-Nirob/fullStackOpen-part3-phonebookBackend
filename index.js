@@ -5,7 +5,6 @@ const morgan = require('morgan')
 // middleware
 app.use(express.json())
 app.use(express.urlencoded())
-app.use(morgan('tiny'))
 
 let persons = [
     {
@@ -29,6 +28,21 @@ let persons = [
         "number": "01719121739"
     }
 ]
+
+// Morgan Token
+morgan.token("person", (request, response) => {
+    if (request.method === "POST") {
+        return JSON.stringify(request.body)
+    } else {
+        return null
+    }
+})
+
+app.use(
+    morgan(
+        ":method :url :status :res[content-length] - :response-time ms :person"
+    )
+)
 
 app.get('/api/persons', (request, response) => {
     response.json(persons)
@@ -95,7 +109,6 @@ app.post('/api/persons', (request, response) => {
     }
 
     persons = persons.concat(person)
-    console.log(person)
     response.json(person)
 })
 
