@@ -66,6 +66,27 @@ app.post('/api/persons', (request, response) => {
 
     const { body } = request
 
+    // Empty related error handling
+    if (!body.name) {
+        return response.status(400).json({
+            error: "name is required"
+        })
+    }
+    if (!body.number) {
+        return response.status(400).json({
+            error: "number is required"
+        })
+    }
+
+    // Checking if person is already exist
+    const alreadyExist = persons.some(person => person.name === body.name)
+
+    if (alreadyExist) {
+        return response.status(400).json({
+            error: "name must be unique"
+        })
+    }
+
     const person = {
         id: generateId(),
         name: body.name,
