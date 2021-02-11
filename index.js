@@ -1,10 +1,13 @@
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
+const cors = require('cors')
 
 // middleware
 app.use(express.json())
 app.use(express.urlencoded())
+app.use(cors())
+
 
 let persons = [
     {
