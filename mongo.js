@@ -22,7 +22,6 @@ const person = new Person({
     name: process.argv[3],
     number: process.argv[4],
 })
-
 if (process.argv.length === 5) {
     person.save().then(() => {
         // console.log("arg0", argv[0])
@@ -31,7 +30,7 @@ if (process.argv.length === 5) {
         // console.log("arg3", argv[3])
         // console.log("arg4", argv[4])
         // console.log("arg5", argv[5])
-        // console.log("arg6", argv[6])
+        // console.log("arg6", argv[6])+++
         console.log(`Added name: ${process.argv[3]} number: ${process.argv[4]} to phonebook`)
         mongoose.connection.close()
     })
