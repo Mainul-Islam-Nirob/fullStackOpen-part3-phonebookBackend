@@ -92,11 +92,21 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {
-    const generateId = () => (Math.random() * 10000).toFixed(0)
+    // const generateId = () => (Math.random() * 10000).toFixed(0)
 
-    const { body } = request
 
-    // Empty related error handling
+    // // Checking if person is already exist
+    // const alreadyExist = persons.some(person => person.name === body.name)
+
+    // if (alreadyExist) {
+    //     return response.status(400).json({
+    //         error: "name must be unique"
+    //     })
+    // }
+
+
+    const body = request.body
+
     if (!body.name) {
         return response.status(400).json({
             error: "name is required"
@@ -108,23 +118,16 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    // Checking if person is already exist
-    const alreadyExist = persons.some(person => person.name === body.name)
-
-    if (alreadyExist) {
-        return response.status(400).json({
-            error: "name must be unique"
-        })
-    }
-
-    const person = {
-        id: generateId(),
+    const person = new Person({
+        // id: generateId(),
         name: body.name,
-        number: body.number
-    }
+        number: body.number,
+    })
 
-    persons = persons.concat(person)
-    response.json(person)
+    person.save().then(savedPerson => {
+        response.json(savedPerson)
+    })
+
 })
 
 const PORT = process.env.PORT
