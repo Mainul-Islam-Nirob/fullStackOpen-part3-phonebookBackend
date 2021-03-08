@@ -7,10 +7,11 @@ const cors = require('cors')
 const Person = require('./models/person')
 
 // middleware
+app.use(express.static('build'))
 app.use(express.json())
 app.use(express.urlencoded())
 app.use(cors())
-app.use(express.static('build'))
+
 
 
 let persons = [
@@ -69,23 +70,23 @@ app.get('/info', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    // const id = Number(request.params.id)
-    // const person = persons.find(person => person.id === id)
+    const id = Number(request.params.id)
+    const person = persons.find(person => person.id === id)
 
-    // if (person) {
-    //     response.json(person)
-    // } else {
-    //     response.status(404).end()
-    // }
-    Person.findById(request.params.id).then(person => {
+    if (person) {
         response.json(person)
-    })
+    } else {
+        response.status(404).end()
+    }
+    // Person.findById(request.params.id).then(person => {
+    //     response.json(person)
+    // })
 
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
     Person.findByIdAndRemove(request.params.id)
-        .then(result => {
+        .then(result => {       
             response.status(204).end()
         })
         .catch(error => next(error))
@@ -130,6 +131,28 @@ app.post('/api/persons', (request, response) => {
     })
 
 })
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+
+// handler of requests with unknown endpoint
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError' && error.message.includes('ObjectId')) {
+        return res.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return res.status(400).json({ error: error.message })
+    }
+
+    next(error)
+}
+
+// handler of requests with result to errors
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
