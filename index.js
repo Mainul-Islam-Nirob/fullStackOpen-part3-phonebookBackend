@@ -1,7 +1,10 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
+
+const Person = require('./models/person')
 
 // middleware
 app.use(express.json())
@@ -49,27 +52,34 @@ app.use(
 )
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({}).then(persons => {
+        response.json(persons.map(person => person.toJSON()))
+    })
 })
 
 app.get('/info', (request, response) => {
-    response.send(
-        `<div>
-            <span>Phonebook has info of ${persons.length} people</span> 
-        </div>
-        <span>${new Date().toString()}</span>`
-    )
+    Person.find({}).then((persons) => {
+        response.send(
+            `<div>
+                <span>Phonebook has info of ${persons.length} people</span> 
+            </div>
+            <span>${new Date().toString()}</span>`
+        )
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(person => person.id === id)
+    // const id = Number(request.params.id)
+    // const person = persons.find(person => person.id === id)
 
-    if (person) {
+    // if (person) {
+    //     response.json(person)
+    // } else {
+    //     response.status(404).end()
+    // }
+    Person.findById(request.params.id).then(person => {
         response.json(person)
-    } else {
-        response.status(404).end()
-    }
+    })
 
 })
 
@@ -78,6 +88,7 @@ app.delete('/api/persons/:id', (request, response) => {
     persons = persons.filter(person => person.id !== id)
 
     response.status(204).end()
+   
 })
 
 app.post('/api/persons', (request, response) => {
@@ -116,7 +127,7 @@ app.post('/api/persons', (request, response) => {
     response.json(person)
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
