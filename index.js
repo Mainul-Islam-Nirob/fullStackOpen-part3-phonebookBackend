@@ -1,6 +1,6 @@
-require('dotenv').config()
 const express = require('express')
 const app = express()
+require('dotenv').config()
 const morgan = require('morgan')
 const cors = require('cors')
 
@@ -11,31 +11,6 @@ app.use(express.static('build'))
 app.use(express.json())
 app.use(express.urlencoded())
 app.use(cors())
-
-
-
-let persons = [
-    {
-        "id": 1,
-        "name": "Nirob Chowdhury",
-        "number": "01783791670"
-    },
-    {
-        "id": 2,
-        "name": "Mainul Islam",
-        "number": "01885597774"
-    },
-    {
-        "id": 3,
-        "name": "Ridoy Khan",
-        "number": "01752311016"
-    },
-    {
-        "id": 4,
-        "name": "Aman Mahbub Hasan",
-        "number": "01719121739"
-    }
-]
 
 // Morgan Token
 morgan.token("person", (request, response) => {
@@ -93,19 +68,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
    
 })
 
-app.post('/api/persons', (request, response) => {
-    // const generateId = () => (Math.random() * 10000).toFixed(0)
-
-
-    // // Checking if person is already exist
-    // const alreadyExist = persons.some(person => person.name === body.name)
-
-    // if (alreadyExist) {
-    //     return response.status(400).json({
-    //         error: "name must be unique"
-    //     })
-    // }
-
+app.post('/api/persons', (request, response, next) => {
 
     const body = request.body
 
@@ -121,16 +84,19 @@ app.post('/api/persons', (request, response) => {
     }
 
     const person = new Person({
-        // id: generateId(),
         name: body.name,
         number: body.number,
     })
 
-    person.save().then(savedPerson => {
-        response.json(savedPerson)
+    person
+        .save()
+        .then(savedPerson => {
+            response.json(savedPerson.toJSON())
+        .catch((error) =>(error))
     })
 
 })
+
 
 const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
