@@ -7,8 +7,8 @@ const cors = require('cors')
 const Person = require('./models/person')
 
 // middleware
-app.use(express.static('build'))
 app.use(express.json())
+app.use(express.static('build'))
 app.use(express.urlencoded())
 app.use(cors())
 
@@ -29,12 +29,13 @@ app.use(
 
 app.get('/api/persons', (request, response) => {
     Person.find({}).then(persons => {
-        response.json(persons.map(person => person.toJSON()))
+        response.json(persons.map(person => person))
     })
 })
 
 app.get('/info', (request, response) => {
-    Person.find({}).then((persons) => {
+    Person.find({})
+    .then((persons) => {
         response.send(
             `<div>
                 <span>Phonebook has info of ${persons.length} people</span> 
@@ -42,6 +43,7 @@ app.get('/info', (request, response) => {
             <span>${new Date().toString()}</span>`
         )
     })
+    .catch((error) => next(error))
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -49,13 +51,13 @@ app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id)
         .then(person => {
             if (person) {
-                response.json(person.toJSON())
+                response.json(person)
             }else{
                 response.status(404).end()
             }   
     })
-    .catch((error) => next(error))
 
+    .catch((error) => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -71,12 +73,12 @@ app.post('/api/persons', (request, response, next) => {
 
     const body = request.body
 
-    if (!body.name) {
+    if (body.name === "") {
         return response.status(400).json({
             error: "name is required"
         })
     }
-    if (!body.number) {
+    if (body.number === "") {
         return response.status(400).json({
             error: "number is required"
         })
@@ -88,11 +90,10 @@ app.post('/api/persons', (request, response, next) => {
     })
 
     person
-        .save()
-        .then(savedPerson => {
-            response.json(savedPerson.toJSON())
-        .catch((error) =>(error))
-    })
+        .save().then(savedPerson => {
+            response.json(savedPerson)
+        })
+        .catch((error) => next(error))
 
 })
 
@@ -107,7 +108,7 @@ app.put('/api/persons/:id', (request, response, next) => {
 
     Person.findByIdAndUpdate(id, person, { new: true })
         .then((updatedPerson) => {
-            response.json(updatedPerson.toJSON())
+            response.json(updatedPerson)
         })
         .catch((error) => next(error))
 })
@@ -122,11 +123,10 @@ app.use(unknownEndpoint)
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
 
-    if (error.name === 'CastError' && error.message.includes('ObjectId')) {
+    if (error.name === 'CastError') {
         return res.status(400).send({ error: 'malformatted id' })
-    } else if (error.name === 'ValidationError') {
-        return res.status(400).json({ error: error.message })
     }
+ 
 
     next(error)
 }
