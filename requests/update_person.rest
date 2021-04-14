@@ -1,0 +1,7 @@
+PUT http://localhost:3001/api/persons/60466d09e2dfa52434c5d2d1
+Content-Type: application/json
+
+{
+    "name": "kHULNA UNIVERSITY",
+    "number": "Mainul Islam"
+}
