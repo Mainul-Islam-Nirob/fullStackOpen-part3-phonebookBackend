@@ -2,6 +2,6 @@ POST http://localhost:3001/api/persons
 Content-Type: application/json
 
 {
-    "name": "kill me 2",
-    "number": "number is unique"
+    "name": "Mainul New",
+    "number": "018855977745"
 }
