@@ -73,26 +73,22 @@ app.post('/api/persons', (request, response, next) => {
 
     const body = request.body
 
-    if (body.name === "") {
-        return response.status(400).json({
-            error: "name is required"
-        })
+    if (body.name === undefined) {
+        return response.status(400).json({ error: 'name missing' })
     }
-    if (body.number === "") {
-        return response.status(400).json({
-            error: "number is required"
-        })
+    if (body.number === undefined) {
+        return response.status(400).json({ error: 'number missing' })
     }
-
     const person = new Person({
         name: body.name,
         number: body.number,
     })
 
     person
-        .save().then(savedPerson => {
-            response.json(savedPerson)
-        })
+        .save()
+            .then(savedPerson => {
+                 response.json(savedPerson.toJSON())
+            })
         .catch((error) => next(error))
 
 })
@@ -124,10 +120,11 @@ const errorHandler = (error, request, response, next) => {
     console.error(error.message)
 
     if (error.name === 'CastError') {
-        return res.status(400).send({ error: 'malformatted id' })
+        return response.status(400).send({ error: 'malformatted id' })
+    } else if(error.name === 'ValidationError'){
+        return response.status(400).json({ error: error.message })
     }
  
-
     next(error)
 }
 
