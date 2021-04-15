@@ -10,7 +10,8 @@
     "build:ui": "rm -rf build && cd ../fullStackOpen/part2/phonebook && npm run build --prod && cp -r build ../../../fullStackOpen-part3-phonebookBackend/",
     "deploy": "git push heroku main",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && npm run deploy",
-    "logs:prod": "heroku logs --tail"
+    "logs:prod": "heroku logs --tail",
+    "lint": "eslint ."
   },
   "engines": {
     "npm": "6.14.9",
@@ -35,6 +36,8 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "eslint": "^7.24.0",
+    "eslint-plugin-react": "^7.23.2",
     "nodemon": "^2.0.7"
   }
 }
